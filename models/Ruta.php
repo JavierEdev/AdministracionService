@@ -81,7 +81,7 @@ class Ruta
         $stmt->bindParam(':id_ruta', $data['id_ruta']);
         $stmt->execute();
         if ($stmt->fetchColumn() == 0) {
-            return null; // Indica que la ruta no existe
+            return null;
         }
 
         // Verificar si hay horarios asociados
@@ -90,7 +90,7 @@ class Ruta
         $stmt->bindParam(':id_ruta', $data['id_ruta']);
         $stmt->execute();
         if ($stmt->fetchColumn() > 0) {
-            return false; // No se puede eliminar porque hay horarios asociados
+            return false;
         }
 
         // Intentar eliminar la ruta

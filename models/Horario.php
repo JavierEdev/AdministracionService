@@ -66,7 +66,7 @@ class Horario
         $stmt->bindParam(':id_ruta', $data['id_ruta'], PDO::PARAM_INT);
         $stmt->execute();
         if ($stmt->fetchColumn() == 0) {
-            return false; // Ruta no existe o no está activa
+            return false;
         }
 
         // Validar bus activo
@@ -75,12 +75,12 @@ class Horario
         $stmt->bindParam(':id_bus', $data['id_bus'], PDO::PARAM_INT);
         $stmt->execute();
         if ($stmt->fetchColumn() == 0) {
-            return false; // Bus no existe o no está activo
+            return false;
         }
 
         // Validar disponibilidad del bus
         if (!$this->check_bus_availability($data['id_bus'], $data['hora_salida'], $data['hora_llegada'], null)) {
-            return false; // Bus ocupado en el rango de tiempo
+            return false;
         }
 
         // Insertar horario
@@ -99,7 +99,7 @@ class Horario
     {
         // Verificar reservas activas
         if ($this->has_active_reservas($id_horario)) {
-            return false; // No se puede modificar si hay reservas activas
+            return false;
         }
 
         // Validar existencia de ruta
@@ -108,7 +108,7 @@ class Horario
         $stmt->bindParam(':id_ruta', $data['id_ruta'], PDO::PARAM_INT);
         $stmt->execute();
         if ($stmt->fetchColumn() == 0) {
-            return false; // Ruta no existe o no está activa
+            return false;
         }
 
         // Validar bus activo
@@ -117,12 +117,12 @@ class Horario
         $stmt->bindParam(':id_bus', $data['id_bus'], PDO::PARAM_INT);
         $stmt->execute();
         if ($stmt->fetchColumn() == 0) {
-            return false; // Bus no existe o no está activo
+            return false;
         }
 
         // Validar disponibilidad del bus
         if (!$this->check_bus_availability($data['id_bus'], $data['hora_salida'], $data['hora_llegada'], $id_horario)) {
-            return false; // Bus ocupado en el rango de tiempo
+            return false;
         }
 
         // Actualizar horario
@@ -153,7 +153,7 @@ class Horario
         $stmt->bindParam(':id_horario', $id_horario, PDO::PARAM_INT);
         $stmt->execute();
         if ($stmt->fetchColumn() == 0) {
-            return null; // Horario no existe
+            return null;
         }
 
         // Eliminar horario

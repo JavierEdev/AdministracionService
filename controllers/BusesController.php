@@ -48,7 +48,7 @@ class BusesController
             Response::send(400, ['message' => 'Capacidad inválida, debe ser un número entre 10 y 50']);
             return;
         }
-        // Establecer estado por defecto a 1 si no se proporciona
+        
         $data['estado'] = isset($data['estado']) && is_numeric($data['estado']) ? $data['estado'] : 1;
         if ($this->bus->insert_bus($data)) {
             Response::send(200, ['message' => 'Bus insertado']);
@@ -67,7 +67,7 @@ class BusesController
             Response::send(400, ['message' => 'Capacidad inválida, debe ser un número positivo']);
             return;
         }
-        // Asegurar que estado sea 0 o 1
+
         $data['estado'] = isset($data['estado']) && is_numeric($data['estado']) ? $data['estado'] : 1;
         if ($this->bus->update_bus($id_bus, $data)) {
             Response::send(200, ['message' => 'Bus actualizado']);

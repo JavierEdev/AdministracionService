@@ -68,13 +68,20 @@ class Bus
 
     public function delete_bus($data)
     {
-        // Verificar si el bus existe
-        $query = "SELECT COUNT(*) FROM " . $this->table . " WHERE id_bus = :id_bus";
+        // Verificar si el bus existe y obtener su estado
+        $query = "SELECT estado FROM " . $this->table . " WHERE id_bus = :id_bus";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id_bus', $data['id_bus']);
         $stmt->execute();
-        if ($stmt->fetchColumn() == 0) {
-            return null; // Indica que el bus no existe
+        $bus = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$bus) {
+            return null;
+        }
+
+        // Verificar si el bus está activo
+        if ($bus['estado'] == 1) {
+            return false;
         }
 
         // Verificar si el bus está asignado a horarios
@@ -83,7 +90,7 @@ class Bus
         $stmt->bindParam(':id_bus', $data['id_bus']);
         $stmt->execute();
         if ($stmt->fetchColumn() > 0) {
-            return false; // No se puede eliminar porque está asignado a horarios
+            return false;
         }
 
         // Intentar eliminar el bus
