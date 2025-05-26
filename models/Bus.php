@@ -17,7 +17,7 @@ class Bus
     public function read_all_buses()
     {
         $query = "SELECT b.id_bus, b.placa, b.capacidad, b.estado, 
-                         (SELECT COUNT(*) FROM horario h WHERE h.id_bus = b.id_bus) = 0 AS disponible
+                         (SELECT COUNT(*) FROM horario h WHERE h.id_bus = b.id_bus AND h.estado = 1) = 0 AS disponible
                   FROM " . $this->table . " b";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -27,7 +27,7 @@ class Bus
     public function read_single_bus($id_bus)
     {
         $query = "SELECT b.id_bus, b.placa, b.capacidad, b.estado, 
-                         (SELECT COUNT(*) FROM horario h WHERE h.id_bus = b.id_bus) = 0 AS disponible
+                         (SELECT COUNT(*) FROM horario h WHERE h.id_bus = b.id_bus AND h.estado = 1) = 0 AS disponible
                   FROM " . $this->table . " b
                   WHERE b.id_bus = :id_bus LIMIT 0,1";
         $stmt = $this->conn->prepare($query);
@@ -68,20 +68,12 @@ class Bus
 
     public function delete_bus($data)
     {
-        // Verificar si el bus existe y obtener su estado
-        $query = "SELECT estado FROM " . $this->table . " WHERE id_bus = :id_bus";
+        $query = "SELECT COUNT(*) FROM " . $this->table . " WHERE id_bus = :id_bus";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id_bus', $data['id_bus']);
         $stmt->execute();
-        $bus = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$bus) {
+        if ($stmt->fetchColumn() == 0) {
             return null;
-        }
-
-        // Verificar si el bus está activo
-        if ($bus['estado'] == 1) {
-            return false;
         }
 
         // Verificar si el bus está asignado a horarios

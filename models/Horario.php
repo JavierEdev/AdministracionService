@@ -37,10 +37,11 @@ class Horario
         return $stmt;
     }
 
-    public function read_single_horario($id_horario)
+public function read_single_horario($id_horario)
     {
         $query = "SELECT 
                      h.id_horario,
+                     h.id_ruta,
                      CONCAT(lo.nombre, ' - ', ld.nombre) AS ruta,
                      b.placa AS bus_placa,
                      h.hora_salida,
@@ -60,7 +61,6 @@ class Horario
 
     public function insert_horario($data)
     {
-        // Validar existencia de ruta
         $query = "SELECT COUNT(*) FROM ruta WHERE id_ruta = :id_ruta AND activo = 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id_ruta', $data['id_ruta'], PDO::PARAM_INT);
@@ -83,7 +83,6 @@ class Horario
             return false;
         }
 
-        // Insertar horario
         $query = "INSERT INTO " . $this->table . " (id_ruta, id_bus, hora_salida, hora_llegada, estado) 
                   VALUES (:id_ruta, :id_bus, :hora_salida, :hora_llegada, :estado)";
         $stmt = $this->conn->prepare($query);

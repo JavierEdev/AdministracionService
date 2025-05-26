@@ -86,7 +86,7 @@ class BusesController
         if ($result === null) {
             Response::send(404, ['message' => 'Bus no encontrado']);
         } elseif ($result === false) {
-            Response::send(400, ['message' => 'No se puede eliminar el bus porque está asignado a horarios']);
+            Response::send(400, ['message' => 'No se puede eliminar el bus: debe estar inactivo y no asignado a horarios']);
         } else {
             Response::send(200, ['message' => 'Bus borrado']);
         }
