@@ -1,20 +1,20 @@
 <?php
-include_once 'models/Lugar.php';
+include_once 'dao/LugarDAO.php';
 
 class LugaresController
 {
     private $db;
-    private $lugar;
+    private $lugarDAO;
 
     public function __construct($db)
     {
         $this->db = $db;
-        $this->lugar = new Lugar($db);
+        $this->lugarDAO = new LugarDAO($db);
     }
 
     public function getAllLugares()
     {
-        $stmt = $this->lugar->read_all_lugares();
+        $stmt = $this->lugarDAO->read_all_lugares();
         $lugaresResponse = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::send(200, $lugaresResponse);
     }
@@ -25,7 +25,7 @@ class LugaresController
             Response::send(400, ['message' => 'ID de lugar inválido']);
             return;
         }
-        $stmt = $this->lugar->read_single_lugar($data['id_lugar']);
+        $stmt = $this->lugarDAO->read_single_lugar($data['id_lugar']);
         $lugarResponse = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($lugarResponse)) {
             Response::send(404, ['message' => 'Lugar no encontrado']);
@@ -40,7 +40,7 @@ class LugaresController
             Response::send(400, ['message' => 'El nombre es obligatorio']);
             return;
         }
-        if ($this->lugar->insert_lugar($data)) {
+        if ($this->lugarDAO->insert_lugar($data)) {
             Response::send(200, ['message' => 'Lugar insertado']);
         } else {
             Response::send(500, ['message' => 'Ocurrió un error en el controlador del lugar']);
@@ -53,7 +53,7 @@ class LugaresController
             Response::send(400, ['message' => 'El nombre es obligatorio']);
             return;
         }
-        if ($this->lugar->update_lugar($id_lugar, $data)) {
+        if ($this->lugarDAO->update_lugar($id_lugar, $data)) {
             Response::send(200, ['message' => 'Lugar actualizado']);
         } else {
             Response::send(500, ['message' => 'Ocurrió un error en el controlador del lugar']);
@@ -66,11 +66,10 @@ class LugaresController
             Response::send(400, ['message' => 'ID de lugar inválido']);
             return;
         }
-        if ($this->lugar->delete_lugar($data)) {
+        if ($this->lugarDAO->delete_lugar($data)) {
             Response::send(200, ['message' => 'Lugar borrado']);
         } else {
             Response::send(500, ['message' => 'Ocurrió un error en el controlador del lugar']);
         }
     }
 }
-?>

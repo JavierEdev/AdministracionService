@@ -1,20 +1,20 @@
 <?php
-include_once 'models/Reserva.php';
+include_once 'dao/ReservaDAO.php';
 
 class ReservasController
 {
     private $db;
-    private $reserva;
+    private $reservaDAO;
 
     public function __construct($db)
     {
         $this->db = $db;
-        $this->reserva = new Reserva($db);
+        $this->reservaDAO = new ReservaDAO($db);
     }
 
     public function getAllReservas()
     {
-        $stmt = $this->reserva->read_all_reservas();
+        $stmt = $this->reservaDAO->read_all_reservas();
         $reservasResponse = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::send(200, $reservasResponse);
     }
@@ -25,7 +25,7 @@ class ReservasController
             Response::send(400, ['message' => 'ID de reserva inválido']);
             return;
         }
-        $stmt = $this->reserva->read_single_reserva($data['id_reserva']);
+        $stmt = $this->reservaDAO->read_single_reserva($data['id_reserva']);
         $reservaResponse = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($reservaResponse)) {
             Response::send(404, ['message' => 'Reserva no encontrada']);
@@ -34,4 +34,3 @@ class ReservasController
         }
     }
 }
-?>

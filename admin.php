@@ -1,11 +1,7 @@
 <?php
 include_once 'config/db.php';
 include_once 'helpers/Response.php';
-include_once 'controllers/LugaresController.php';
-include_once 'controllers/RutasController.php';
-include_once 'controllers/BusesController.php';
-include_once 'controllers/ReservasController.php';
-include_once 'controllers/HorariosController.php';
+include_once 'factories/ControllerFactory.php';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -18,130 +14,93 @@ $uri = explode('/', trim(str_replace('/AdministracionService/admin.php', '', $ur
 
 $db = (new DB())->getConnection();
 
+if (empty($uri[0])) {
+    Response::send(404, ['message' => 'Not found']);
+    exit;
+}
+
+try {
+    $controller = ControllerFactory::createController($uri[0], $db);
+} catch (Exception $e) {
+    Response::send(404, ['message' => 'Not found']);
+    exit;
+}
+
+$action = isset($uri[1]) ? $uri[1] : null;
+$data = $method === 'GET' ? $_GET : json_decode(file_get_contents("php://input"), true);
+
 switch ($uri[0]) {
     case 'lugares':
-        $lugaresController = new LugaresController($db);
-
-        if ($method === 'POST' && !isset($uri[1])) {
-            $lugaresController->getAllLugares();
-        }
-
-        if ($method === 'POST' && $uri[1] === 'idLugar') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $lugaresController->getLugarById($data);
-        }
-
-        if ($method === 'POST' && $uri[1] === 'insertLugar') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $lugaresController->insertLugar($data);
-        }
-
-        if ($method === 'PUT' && $uri[1] === 'updateLugar') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $lugaresController->updateLugar($data['id_lugar'], $data);
-        }
-
-        if ($method === 'DELETE' && $uri[1] === 'deleteLugar') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $lugaresController->deleteLugar($data);
+        if ($method === 'POST' && !$action) {
+            $controller->getAllLugares();
+        } elseif ($method === 'POST' && $action === 'idLugar') {
+            $controller->getLugarById($data);
+        } elseif ($method === 'POST' && $action === 'insertLugar') {
+            $controller->insertLugar($data);
+        } elseif ($method === 'PUT' && $action === 'updateLugar') {
+            $controller->updateLugar($data['id_lugar'], $data);
+        } elseif ($method === 'DELETE' && $action === 'deleteLugar') {
+            $controller->deleteLugar($data);
+        } else {
+            Response::send(404, ['message' => 'Not found']);
         }
         break;
 
     case 'rutas':
-        $rutasController = new RutasController($db);
-
-        if ($method === 'POST' && !isset($uri[1])) {
-            $rutasController->getAllRutas();
-        }
-
-        if ($method === 'POST' && $uri[1] === 'idRuta') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $rutasController->getRutaById($data);
-        }
-
-        if ($method === 'POST' && $uri[1] === 'insertRuta') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $rutasController->insertRuta($data);
-        }
-
-        if ($method === 'PUT' && $uri[1] === 'updateRuta') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $rutasController->updateRuta($data['id_ruta'], $data);
-        }
-
-        if ($method === 'DELETE' && $uri[1] === 'deleteRuta') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $rutasController->deleteRuta($data);
+        if ($method === 'POST' && !$action) {
+            $controller->getAllRutas();
+        } elseif ($method === 'POST' && $action === 'idRuta') {
+            $controller->getRutaById($data);
+        } elseif ($method === 'POST' && $action === 'insertRuta') {
+            $controller->insertRuta($data);
+        } elseif ($method === 'PUT' && $action === 'updateRuta') {
+            $controller->updateRuta($data['id_ruta'], $data);
+        } elseif ($method === 'DELETE' && $action === 'deleteRuta') {
+            $controller->deleteRuta($data);
+        } else {
+            Response::send(404, ['message' => 'Not found']);
         }
         break;
 
     case 'buses':
-        $busesController = new BusesController($db);
-
-        if ($method === 'POST' && !isset($uri[1])) {
-            $busesController->getAllBuses();
-        }
-
-        if ($method === 'POST' && $uri[1] === 'idBus') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $busesController->getBusById($data);
-        }
-
-        if ($method === 'POST' && $uri[1] === 'insertBus') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $busesController->insertBus($data);
-        }
-
-        if ($method === 'PUT' && $uri[1] === 'updateBus') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $busesController->updateBus($data['id_bus'], $data);
-        }
-
-        if ($method === 'DELETE' && $uri[1] === 'deleteBus') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $busesController->deleteBus($data);
+        if ($method === 'POST' && !$action) {
+            $controller->getAllBuses();
+        } elseif ($method === 'POST' && $action === 'idBus') {
+            $controller->getBusById($data);
+        } elseif ($method === 'POST' && $action === 'insertBus') {
+            $controller->insertBus($data);
+        } elseif ($method === 'PUT' && $action === 'updateBus') {
+            $controller->updateBus($data['id_bus'], $data);
+        } elseif ($method === 'DELETE' && $action === 'deleteBus') {
+            $controller->deleteBus($data);
+        } else {
+            Response::send(404, ['message' => 'Not found']);
         }
         break;
 
     case 'reservas':
-        $reservasController = new ReservasController($db);
-
-        if ($method === 'POST' && !isset($uri[1])) {
-            $reservasController->getAllReservas();
-        }
-
-        if ($method === 'POST' && $uri[1] === 'idReserva') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $reservasController->getReservaById($data);
+        if ($method === 'POST' && !$action) {
+            $controller->getAllReservas();
+        } elseif ($method === 'POST' && $action === 'idReserva') {
+            $controller->getReservaById($data);
+        } else {
+            Response::send(404, ['message' => 'Not found']);
         }
         break;
 
     case 'horarios':
-        $horariosController = new HorariosController($db);
-
-        if ($method === 'POST' && $uri[1] === 'idRuta') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $horariosController->getHorariosByRuta($data);
-        }
-
-        if ($method === 'POST' && $uri[1] === 'idHorario') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $horariosController->getHorarioById($data);
-        }
-
-        if ($method === 'POST' && $uri[1] === 'insertHorario') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $horariosController->insertHorario($data);
-        }
-
-        if ($method === 'PUT' && $uri[1] === 'updateHorario') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $horariosController->updateHorario($data);
-        }
-
-        if ($method === 'DELETE' && $uri[1] === 'deleteHorario') {
-            $data = json_decode(file_get_contents("php://input"), true);
-            $horariosController->deleteHorario($data);
+        if ($method === 'POST' && $action === 'idRuta') {
+            $controller->getHorariosByRuta($data);
+        } elseif ($method === 'POST' && $action === 'idHorario') {
+            $controller->getHorarioById($data);
+        } elseif ($method === 'POST' && $action === 'insertHorario') {
+            $controller->insertHorario($data);
+        } elseif ($method === 'PUT' && $action === 'updateHorario') {
+            $controller->updateHorario($data);
+        } elseif ($method === 'DELETE' && $action === 'deleteHorario') {
+            $controller->deleteHorario($data);
+        } else {
+            Response::send(404, ['message' => 'Not found']);
         }
         break;
 
@@ -149,4 +108,3 @@ switch ($uri[0]) {
         Response::send(404, ['message' => 'Not found']);
         break;
 }
-?>

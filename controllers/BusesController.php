@@ -1,20 +1,20 @@
 <?php
-include_once 'models/Bus.php';
+include_once 'dao/BusDAO.php';
 
 class BusesController
 {
     private $db;
-    private $bus;
+    private $busDAO;
 
     public function __construct($db)
     {
         $this->db = $db;
-        $this->bus = new Bus($db);
+        $this->busDAO = new BusDAO($db);
     }
 
     public function getAllBuses()
     {
-        $stmt = $this->bus->read_all_buses();
+        $stmt = $this->busDAO->read_all_buses();
         $busesResponse = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::send(200, $busesResponse);
     }
@@ -25,7 +25,7 @@ class BusesController
             Response::send(400, ['message' => 'ID de bus inválido']);
             return;
         }
-        $stmt = $this->bus->read_single_bus($data['id_bus']);
+        $stmt = $this->busDAO->read_single_bus($data['id_bus']);
         $busResponse = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($busResponse)) {
             Response::send(404, ['message' => 'Bus no encontrado']);
@@ -50,7 +50,7 @@ class BusesController
         }
         
         $data['estado'] = isset($data['estado']) && is_numeric($data['estado']) ? $data['estado'] : 1;
-        if ($this->bus->insert_bus($data)) {
+        if ($this->busDAO->insert_bus($data)) {
             Response::send(200, ['message' => 'Bus insertado']);
         } else {
             Response::send(500, ['message' => 'Ocurrió un error al insertar el bus']);
@@ -69,7 +69,7 @@ class BusesController
         }
 
         $data['estado'] = isset($data['estado']) && is_numeric($data['estado']) ? $data['estado'] : 1;
-        if ($this->bus->update_bus($id_bus, $data)) {
+        if ($this->busDAO->update_bus($id_bus, $data)) {
             Response::send(200, ['message' => 'Bus actualizado']);
         } else {
             Response::send(500, ['message' => 'Ocurrió un error al actualizar el bus']);
@@ -82,7 +82,7 @@ class BusesController
             Response::send(400, ['message' => 'ID de bus inválido']);
             return;
         }
-        $result = $this->bus->delete_bus($data);
+        $result = $this->busDAO->delete_bus($data);
         if ($result === null) {
             Response::send(404, ['message' => 'Bus no encontrado']);
         } elseif ($result === false) {
@@ -92,4 +92,3 @@ class BusesController
         }
     }
 }
-?>

@@ -1,9 +1,5 @@
 <?php
-class Reserva
-{
-    private $conn;
-    private $table = 'reserva';
-
+class Reserva {
     public $id_reserva;
     public $id_horario;
     public $cantidad_asientos;
@@ -12,53 +8,59 @@ class Reserva
     public $correo_cliente;
     public $fecha_reserva;
 
-    public function __construct($db)
-    {
-        $this->conn = $db;
+    public function getIdReserva() {
+        return $this->id_reserva;
     }
 
-    public function read_all_reservas()
-    {
-        $query = "SELECT 
-                     r.id_reserva,
-                     r.correo_cliente,
-                     CONCAT(lo.nombre, ' - ', ld.nombre) AS ruta,
-                     CONCAT(h.hora_salida, ' - ', h.hora_llegada) AS horario,
-                     r.cantidad_asientos,
-                     r.codigo_boleto,
-                     r.estado,
-                     r.fecha_reserva
-                  FROM " . $this->table . " r
-                  INNER JOIN horario h ON r.id_horario = h.id_horario
-                  INNER JOIN ruta rt ON h.id_ruta = rt.id_ruta
-                  INNER JOIN lugar lo ON rt.id_origen = lo.id_lugar
-                  INNER JOIN lugar ld ON rt.id_destino = ld.id_lugar";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt;
+    public function setIdReserva($id_reserva) {
+        $this->id_reserva = $id_reserva;
     }
 
-    public function read_single_reserva($id_reserva)
-    {
-        $query = "SELECT 
-                     r.id_reserva,
-                     r.correo_cliente,
-                     CONCAT(lo.nombre, ' - ', ld.nombre) AS ruta,
-                     CONCAT(h.hora_salida, ' - ', h.hora_llegada) AS horario,
-                     r.cantidad_asientos,
-                     r.codigo_boleto,
-                     r.estado,
-                     r.fecha_reserva
-                  FROM " . $this->table . " r
-                  INNER JOIN horario h ON r.id_horario = h.id_horario
-                  INNER JOIN ruta rt ON h.id_ruta = rt.id_ruta
-                  INNER JOIN lugar lo ON rt.id_origen = lo.id_lugar
-                  INNER JOIN lugar ld ON rt.id_destino = ld.id_lugar
-                  WHERE r.id_reserva = :id_reserva LIMIT 0,1";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id_reserva', $id_reserva, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt;
+    public function getIdHorario() {
+        return $this->id_horario;
+    }
+
+    public function setIdHorario($id_horario) {
+        $this->id_horario = $id_horario;
+    }
+
+    public function getCantidadAsientos() {
+        return $this->cantidad_asientos;
+    }
+
+    public function setCantidadAsientos($cantidad_asientos) {
+        $this->cantidad_asientos = $cantidad_asientos;
+    }
+
+    public function getEstado() {
+        return $this->estado;
+    }
+
+    public function setEstado($estado) {
+        $this->estado = $estado;
+    }
+
+    public function getCodigoBoleto() {
+        return $this->codigo_boleto;
+    }
+
+    public function setCodigoBoleto($codigo_boleto) {
+        $this->codigo_boleto = $codigo_boleto;
+    }
+
+    public function getCorreoCliente() {
+        return $this->correo_cliente;
+    }
+
+    public function setCorreoCliente($correo_cliente) {
+        $this->correo_cliente = $correo_cliente;
+    }
+
+    public function getFechaReserva() {
+        return $this->fecha_reserva;
+    }
+
+    public function setFechaReserva($fecha_reserva) {
+        $this->fecha_reserva = $fecha_reserva;
     }
 }
-?>

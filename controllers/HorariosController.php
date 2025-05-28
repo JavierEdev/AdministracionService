@@ -1,15 +1,15 @@
 <?php
-include_once 'models/Horario.php';
+include_once 'dao/HorarioDAO.php';
 
 class HorariosController
 {
     private $db;
-    private $horario;
+    private $horarioDAO;
 
     public function __construct($db)
     {
         $this->db = $db;
-        $this->horario = new Horario($db);
+        $this->horarioDAO = new HorarioDAO($db);
     }
 
     public function getHorariosByRuta($data)
@@ -18,7 +18,7 @@ class HorariosController
             Response::send(400, ['message' => 'ID de ruta inválido']);
             return;
         }
-        $stmt = $this->horario->read_by_ruta($data['id_ruta']);
+        $stmt = $this->horarioDAO->read_by_ruta($data['id_ruta']);
         $horariosResponse = $stmt->fetchAll(PDO::FETCH_ASSOC);
         Response::send(200, $horariosResponse);
     }
@@ -29,7 +29,7 @@ class HorariosController
             Response::send(400, ['message' => 'ID de horario inválido']);
             return;
         }
-        $stmt = $this->horario->read_single_horario($data['id_horario']);
+        $stmt = $this->horarioDAO->read_single_horario($data['id_horario']);
         $horarioResponse = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if (empty($horarioResponse)) {
             Response::send(404, ['message' => 'Horario no encontrado']);
@@ -62,7 +62,7 @@ class HorariosController
         }
         $data['estado'] = isset($data['estado']) && is_numeric($data['estado']) ? (bool)$data['estado'] : true;
 
-        if ($this->horario->insert_horario($data)) {
+        if ($this->horarioDAO->insert_horario($data)) {
             Response::send(200, ['message' => 'Horario insertado']);
         } else {
             Response::send(400, ['message' => 'No se pudo insertar el horario. Verifique que la ruta y el bus existan, estén activos y que el bus esté disponible']);
@@ -97,7 +97,7 @@ class HorariosController
         }
         $data['estado'] = isset($data['estado']) && is_numeric($data['estado']) ? (bool)$data['estado'] : true;
 
-        if ($this->horario->update_horario($data['id_horario'], $data)) {
+        if ($this->horarioDAO->update_horario($data['id_horario'], $data)) {
             Response::send(200, ['message' => 'Horario actualizado']);
         } else {
             Response::send(400, ['message' => 'No se pudo actualizar el horario. Verifique que no haya reservas activas, que la ruta y el bus existan, estén activos y que el bus esté disponible']);
@@ -110,7 +110,7 @@ class HorariosController
             Response::send(400, ['message' => 'ID de horario inválido']);
             return;
         }
-        $result = $this->horario->delete_horario($data['id_horario']);
+        $result = $this->horarioDAO->delete_horario($data['id_horario']);
         if ($result === null) {
             Response::send(404, ['message' => 'Horario no encontrado']);
         } elseif ($result === false) {
@@ -120,4 +120,3 @@ class HorariosController
         }
     }
 }
-?>
